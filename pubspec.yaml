@@ -4,17 +4,24 @@ publish_to: 'none'
 version: 0.1.0
 
 environment:
-  sdk: ^3.9.2
+  sdk: '>=3.0.0 <4.0.0'
 
 dependencies:
   flutter:
     sdk: flutter
+  # Existing dependencies
+  flutter_svg: ^2.0.10
+  
+  # New Supabase & UI dependencies
+  supabase_flutter: ^2.8.0
+  google_fonts: ^6.2.0
+  cached_network_image: ^3.4.0
+  intl: ^0.20.2
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^5.0.0
-  flutter_svg: ^2.0.10
+  flutter_lints: ^6.0.0
 
 flutter:
   uses-material-design: true

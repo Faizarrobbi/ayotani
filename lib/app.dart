@@ -15,7 +15,7 @@ class App extends StatelessWidget {
         scaffoldBackgroundColor: Colors.white,
         colorScheme: ColorScheme.fromSeed(seedColor: AppColors.green),
       ),
-      initialRoute: AppRoutes.signup, // atau AppRoutes.login
+      initialRoute: AppRoutes.marketplace,
       routes: AppRoutes.routes,
     );
   }
