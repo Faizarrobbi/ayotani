@@ -4,6 +4,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 
 import '../../models/product_model.dart';
 import '../../theme/app_colors.dart';
+import '../../routes/app_routes.dart';
 
 class ProductDetailScreen extends StatefulWidget {
   final Product product;
@@ -18,6 +19,25 @@ class ProductDetailScreen extends StatefulWidget {
 }
 
 class _ProductDetailScreenState extends State<ProductDetailScreen> {
+  int _selectedIndex = 1; // Shop is selected
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+
+    if (index == 0) { // Home
+      Navigator.pushNamed(context, AppRoutes.home);
+    } else if (index == 1) { // Shop - go back to marketplace
+      Navigator.pop(context); // Assuming this pops back to marketplace
+    } else {
+      // For other tabs, show a message or implement later
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Feature coming soon')),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -285,6 +305,20 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
             ),
           ),
         ),
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        type: BottomNavigationBarType.fixed,
+        selectedItemColor: Color(0xFF0B6138),
+        unselectedItemColor: Colors.grey,
+        currentIndex: _selectedIndex,
+        onTap: _onItemTapped,
+        items: const [
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
+          BottomNavigationBarItem(icon: Icon(Icons.shopping_cart_outlined), label: "Shop"),
+          BottomNavigationBarItem(icon: Icon(Icons.eco_outlined), label: "Plant"),
+          BottomNavigationBarItem(icon: Icon(Icons.chat_bubble_outline), label: "Community"),
+          BottomNavigationBarItem(icon: Icon(Icons.person_outline), label: "Profil"),
+        ],
       ),
     );
   }

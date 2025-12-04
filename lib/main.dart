@@ -4,6 +4,9 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:intl/intl.dart';
 
+import 'pages/auth/login_page.dart';
+import 'routes/app_routes.dart';
+
 // --- CONFIGURATION ---
 // I have turned off mock data. The app will now attempt to connect to your real database.
 const bool useMockData = false; 
@@ -65,7 +68,8 @@ class AyoTaniApp extends StatelessWidget {
         ),
         useMaterial3: true,
       ),
-      home: const MarketplaceScreen(),
+      routes: AppRoutes.routes,
+      home: const LoginPage(),
     );
   }
 }

@@ -5,6 +5,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../models/product_model.dart';
 import '../../theme/app_colors.dart';
+import '../../routes/app_routes.dart';
 import 'product_detail_screen.dart';
 
 class MarketplaceScreen extends StatefulWidget {
@@ -15,6 +16,24 @@ class MarketplaceScreen extends StatefulWidget {
 }
 
 class _MarketplaceScreenState extends State<MarketplaceScreen> {
+  int _selectedIndex = 1; // Shop is selected
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+
+    if (index == 0) { // Home
+      Navigator.pushNamed(context, AppRoutes.home);
+    } else if (index == 1) { // Shop - already here
+      // Do nothing
+    } else {
+      // For other tabs, show a message or implement later
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Feature coming soon')),
+      );
+    }
+  }
   late Future<List<Product>> _productsFuture;
 
   @override
@@ -162,6 +181,20 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
             },
           );
         },
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        type: BottomNavigationBarType.fixed,
+        selectedItemColor: Color(0xFF0B6138),
+        unselectedItemColor: Colors.grey,
+        currentIndex: _selectedIndex,
+        onTap: _onItemTapped,
+        items: const [
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
+          BottomNavigationBarItem(icon: Icon(Icons.shopping_cart_outlined), label: "Shop"),
+          BottomNavigationBarItem(icon: Icon(Icons.eco_outlined), label: "Plant"),
+          BottomNavigationBarItem(icon: Icon(Icons.chat_bubble_outline), label: "Community"),
+          BottomNavigationBarItem(icon: Icon(Icons.person_outline), label: "Profil"),
+        ],
       ),
     );
   }

@@ -167,7 +167,7 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                     ),
                     onPressed: () {
-                      // TODO: handle login
+                      Navigator.pushReplacementNamed(context, AppRoutes.home);
                     },
                     child: const Text("Login"),
                   ),

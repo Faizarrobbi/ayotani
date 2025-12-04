@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../routes/app_routes.dart';
 
 class HeaderSection extends StatelessWidget {
   const HeaderSection({super.key});
@@ -38,7 +39,18 @@ class HeaderSection extends StatelessWidget {
                   )
                 ],
               ),
-              const Icon(Icons.notifications_outlined, color: Colors.white, size: 26),
+              Row(
+                children: [
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.pushNamed(context, AppRoutes.marketplace);
+                    },
+                    child: const Icon(Icons.shopping_cart_outlined, color: Colors.white, size: 26),
+                  ),
+                  const SizedBox(width: 15),
+                  const Icon(Icons.notifications_outlined, color: Colors.white, size: 26),
+                ],
+              ),
             ],
           ),
           const SizedBox(height: 15),
