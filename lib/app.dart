@@ -7,15 +7,17 @@ class App extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Providers are already injected in main.dart, so we just build the MaterialApp here
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'My App',
+      title: 'Ayo Tani',
       theme: ThemeData(
         useMaterial3: true,
         scaffoldBackgroundColor: Colors.white,
         colorScheme: ColorScheme.fromSeed(seedColor: AppColors.green),
+        fontFamily: 'Inter',
       ),
-      initialRoute: AppRoutes.marketplace,
+      initialRoute: AppRoutes.splash,
       routes: AppRoutes.routes,
     );
   }
