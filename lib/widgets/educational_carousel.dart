@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../models/educational_content_model.dart';
 import '../services/educational_service.dart';
 import '../theme/app_colors.dart';
+import '../routes/app_routes.dart';
 
 class EducationalCarousel extends StatefulWidget {
   const EducationalCarousel({super.key});
@@ -54,12 +55,16 @@ class _EducationalCarouselState extends State<EducationalCarousel> {
                   fontWeight: FontWeight.w700,
                 ),
               ),
-              Text(
-                'Lihat Semua',
-                style: TextStyle(
-                  fontSize: 12,
-                  color: AppColors.green,
-                  fontWeight: FontWeight.w600,
+              GestureDetector(
+                onTap: () =>
+                    Navigator.pushNamed(context, AppRoutes.educational),
+                child: Text(
+                  'Lihat Semua',
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: AppColors.green,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
               ),
             ],
@@ -76,7 +81,17 @@ class _EducationalCarouselState extends State<EducationalCarousel> {
               final content = contents[index];
               return Padding(
                 padding: const EdgeInsets.only(right: 12),
-                child: _buildContentCard(content),
+                child: InkWell(
+                  onTap: () {
+                    Navigator.pushNamed(
+                      context,
+                      AppRoutes.educationalDetail,
+                      arguments: {'id': content.id},
+                    );
+                  },
+                  borderRadius: BorderRadius.circular(12),
+                  child: _buildContentCard(content),
+                ),
               );
             },
           ),
@@ -141,7 +156,8 @@ class _EducationalCarouselState extends State<EducationalCarousel> {
                 ),
                 const SizedBox(height: 6),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
                   decoration: BoxDecoration(
                     color: difficultyColor.withOpacity(0.2),
                     borderRadius: BorderRadius.circular(4),

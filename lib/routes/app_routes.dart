@@ -10,6 +10,8 @@ import '../pages/marketplace/marketplace_screen.dart';
 import '../pages/marketplace/payment.dart';
 import '../pages/marketplace/payment_done.dart';
 import '../pages/marketplace/payment_method.dart';
+import '../pages/education/educational_list_screen.dart';
+import '../pages/education/educational_detail_screen.dart';
 
 class AppRoutes {
   static const splash = '/splash';
@@ -23,6 +25,8 @@ class AppRoutes {
   static const paymentMethod = '/payment-method';
   static const payment = '/payment';
   static const paymentDone = '/payment-done';
+  static const educational = '/educational';
+  static const educationalDetail = '/educational-detail';
 
   static Map<String, WidgetBuilder> get routes => {
         splash: (_) => const SplashScreen(),
@@ -46,5 +50,12 @@ class AppRoutes {
           );
         },
         paymentDone: (_) => const PaymentDoneScreen(),
+        educational: (_) => const EducationalListScreen(),
+        educationalDetail: (context) {
+          final args = ModalRoute.of(context)?.settings.arguments
+              as Map<String, dynamic>?;
+          final id = args?['id'] as int? ?? 0;
+          return EducationalDetailScreen(contentId: id);
+        },
       };
 }

@@ -60,14 +60,21 @@ class _HomeScreenState extends State<HomeScreen> {
         selectedItemColor: const Color(0xFF0A3D2F),
         unselectedItemColor: Colors.grey,
         showUnselectedLabels: true,
-        selectedLabelStyle: GoogleFonts.inter(fontSize: 10, fontWeight: FontWeight.w600),
-        unselectedLabelStyle: GoogleFonts.inter(fontSize: 10, fontWeight: FontWeight.w500),
+        selectedLabelStyle:
+            GoogleFonts.inter(fontSize: 10, fontWeight: FontWeight.w600),
+        unselectedLabelStyle:
+            GoogleFonts.inter(fontSize: 10, fontWeight: FontWeight.w500),
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home_filled), label: 'Home'),
-          BottomNavigationBarItem(icon: Icon(Icons.storefront_outlined), label: 'Shop'),
-          BottomNavigationBarItem(icon: Icon(Icons.eco_outlined), label: 'Plant'),
-          BottomNavigationBarItem(icon: Icon(Icons.chat_bubble_outline_rounded), label: 'Community'),
-          BottomNavigationBarItem(icon: Icon(Icons.person_outline_rounded), label: 'Profil'),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.storefront_outlined), label: 'Shop'),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.eco_outlined), label: 'Plant'),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.chat_bubble_outline_rounded),
+              label: 'Community'),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.person_outline_rounded), label: 'Profil'),
         ],
       ),
     );
@@ -75,11 +82,17 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _getScreenForIndex(int index) {
     switch (index) {
-      case 1: return const MarketplaceScreen();
-      case 2: return const MonitoringScreen(); // "Plant" maps to Monitoring
-      case 3: return const CommunityScreen();
-      case 4: return const Center(child: Text("Profile Screen")); // Placeholder for Profile
-      default: return const SizedBox();
+      case 1:
+        return const MarketplaceScreen();
+      case 2:
+        return const MonitoringScreen(); // "Plant" maps to Monitoring
+      case 3:
+        return const CommunityScreen();
+      case 4:
+        return const Center(
+            child: Text("Profile Screen")); // Placeholder for Profile
+      default:
+        return const SizedBox();
     }
   }
 }
@@ -93,6 +106,34 @@ class _HomeContent extends StatefulWidget {
 }
 
 class _HomeContentState extends State<_HomeContent> {
+  
+  String _resolveVideoThumbnail(Map<String, dynamic> video) {
+    final t = (video['thumbnail_url'] as String?)?.trim();
+    if (t != null && t.isNotEmpty) return t;
+
+    final url = (video['video_url'] as String?)?.trim() ?? '';
+    final id = _youtubeIdFromUrl(url);
+    if (id != null) {
+      // maxres kadang tidak ada, tapi cukup oke untuk start
+      return 'https://img.youtube.com/vi/$id/maxresdefault.jpg';
+    }
+
+    return 'https://via.placeholder.com/240x135';
+}
+
+String? _youtubeIdFromUrl(String url) {
+  // support: https://www.youtube.com/watch?v=xxxx  /  https://youtu.be/xxxx
+  final reg1 = RegExp(r'v=([a-zA-Z0-9_-]{6,})');
+  final m1 = reg1.firstMatch(url);
+  if (m1 != null) return m1.group(1);
+
+  final reg2 = RegExp(r'youtu\.be\/([a-zA-Z0-9_-]{6,})');
+  final m2 = reg2.firstMatch(url);
+  if (m2 != null) return m2.group(1);
+
+  return null;
+}
+
   // Data State
   Map<String, dynamic>? _weatherData;
   List<Land> _lands = [];
@@ -117,8 +158,9 @@ class _HomeContentState extends State<_HomeContent> {
         .select()
         .eq('user_id', userId)
         .order('created_at', ascending: false);
-    
-    List<Land> lands = (landsResponse as List).map((e) => Land.fromJson(e)).toList();
+
+    List<Land> lands =
+        (landsResponse as List).map((e) => Land.fromJson(e)).toList();
 
     // 2. Fetch Weather based on first land or default to Surabaya
     // Coordinates for Surabaya: -7.2575, 112.7521
@@ -199,7 +241,10 @@ class _HomeContentState extends State<_HomeContent> {
           const SizedBox(height: 24),
 
           // 4. VIDEO BELAJAR
-          _buildSectionHeader('Video Belajar', () {}),
+          _buildSectionHeader('Video Belajar', () {
+            Navigator.pushNamed(context, AppRoutes.educational);
+          }),
+
           const SizedBox(height: 12),
           _buildFilterChips(),
           const SizedBox(height: 16),
@@ -245,7 +290,8 @@ class _HomeContentState extends State<_HomeContent> {
                         const CircleAvatar(
                           radius: 24,
                           backgroundColor: Colors.white,
-                          child: Icon(Icons.person, size: 28, color: Colors.grey),
+                          child:
+                              Icon(Icons.person, size: 28, color: Colors.grey),
                         ),
                         const SizedBox(width: 12),
                         Column(
@@ -254,39 +300,36 @@ class _HomeContentState extends State<_HomeContent> {
                             Text(
                               'Halo, $name',
                               style: GoogleFonts.inter(
-                                color: Colors.white, 
-                                fontSize: 18, 
-                                fontWeight: FontWeight.bold
-                              ),
+                                  color: Colors.white,
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold),
                             ),
                             Text(
                               'Mau belajar apa hari ini?',
                               style: GoogleFonts.inter(
-                                color: Colors.white70, 
-                                fontSize: 12
-                              ),
+                                  color: Colors.white70, fontSize: 12),
                             ),
                           ],
                         ),
                       ],
                     ),
-                    const Icon(Icons.notifications_outlined, color: Colors.white, size: 28),
+                    const Icon(Icons.notifications_outlined,
+                        color: Colors.white, size: 28),
                   ],
                 ),
                 const SizedBox(height: 12),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(20)
-                  ),
+                      color: Colors.white.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(20)),
                   child: Text(
                     'Level $level | $gems Gems',
                     style: GoogleFonts.inter(
-                      color: const Color(0xFFFFD700), 
-                      fontSize: 12, 
-                      fontWeight: FontWeight.w600
-                    ),
+                        color: const Color(0xFFFFD700),
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600),
                   ),
                 ),
                 const SizedBox(height: 24),
@@ -294,16 +337,15 @@ class _HomeContentState extends State<_HomeContent> {
                 Container(
                   height: 48,
                   decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(12),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.05),
-                        blurRadius: 10,
-                        offset: const Offset(0, 4),
-                      )
-                    ]
-                  ),
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(12),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.05),
+                          blurRadius: 10,
+                          offset: const Offset(0, 4),
+                        )
+                      ]),
                   child: TextField(
                     decoration: InputDecoration(
                       prefixIcon: const Icon(Icons.search, color: Colors.grey),
@@ -334,12 +376,16 @@ class _HomeContentState extends State<_HomeContent> {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(20),
         image: const DecorationImage(
-          image: NetworkImage('https://images.unsplash.com/photo-1534088568595-a066f410bcda?auto=format&fit=crop&w=800&q=80'), // Scenic field
+          image: NetworkImage(
+              'https://images.unsplash.com/photo-1534088568595-a066f410bcda?auto=format&fit=crop&w=800&q=80'), // Scenic field
           fit: BoxFit.cover,
           colorFilter: ColorFilter.mode(Colors.black26, BlendMode.darken),
         ),
         boxShadow: [
-          BoxShadow(color: Colors.green.withOpacity(0.2), blurRadius: 15, offset: const Offset(0, 8)),
+          BoxShadow(
+              color: Colors.green.withOpacity(0.2),
+              blurRadius: 15,
+              offset: const Offset(0, 8)),
         ],
       ),
       child: Column(
@@ -347,13 +393,21 @@ class _HomeContentState extends State<_HomeContent> {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Icon(Icons.wb_sunny_rounded, color: Colors.orangeAccent, size: 48),
+              const Icon(Icons.wb_sunny_rounded,
+                  color: Colors.orangeAccent, size: 48),
               const SizedBox(width: 16),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('$temp°', style: GoogleFonts.inter(color: Colors.white, fontSize: 40, fontWeight: FontWeight.bold, height: 1.0)),
-                  Text('Hari ini cukup cerah', style: GoogleFonts.inter(color: Colors.white.withOpacity(0.9), fontSize: 13)),
+                  Text('$temp°',
+                      style: GoogleFonts.inter(
+                          color: Colors.white,
+                          fontSize: 40,
+                          fontWeight: FontWeight.bold,
+                          height: 1.0)),
+                  Text('Hari ini cukup cerah',
+                      style: GoogleFonts.inter(
+                          color: Colors.white.withOpacity(0.9), fontSize: 13)),
                 ],
               ),
             ],
@@ -382,9 +436,14 @@ class _HomeContentState extends State<_HomeContent> {
   Widget _buildWeatherStat(String value, String label) {
     return Column(
       children: [
-        Text(value, style: GoogleFonts.inter(fontWeight: FontWeight.bold, fontSize: 14, color: Colors.black87)),
+        Text(value,
+            style: GoogleFonts.inter(
+                fontWeight: FontWeight.bold,
+                fontSize: 14,
+                color: Colors.black87)),
         const SizedBox(height: 2),
-        Text(label, style: GoogleFonts.inter(color: Colors.grey[600], fontSize: 10)),
+        Text(label,
+            style: GoogleFonts.inter(color: Colors.grey[600], fontSize: 10)),
       ],
     );
   }
@@ -395,10 +454,18 @@ class _HomeContentState extends State<_HomeContent> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(title, style: GoogleFonts.inter(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black)),
+          Text(title,
+              style: GoogleFonts.inter(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black)),
           GestureDetector(
             onTap: onSeeAll,
-            child: Text('SEE ALL >', style: GoogleFonts.inter(fontSize: 12, color: const Color(0xFF0A3D2F), fontWeight: FontWeight.bold)),
+            child: Text('SEE ALL >',
+                style: GoogleFonts.inter(
+                    fontSize: 12,
+                    color: const Color(0xFF0A3D2F),
+                    fontWeight: FontWeight.bold)),
           ),
         ],
       ),
@@ -406,8 +473,10 @@ class _HomeContentState extends State<_HomeContent> {
   }
 
   Widget _buildLandList() {
-    if (_isLoading) return const SizedBox(height: 180, child: Center(child: CircularProgressIndicator()));
-    
+    if (_isLoading)
+      return const SizedBox(
+          height: 180, child: Center(child: CircularProgressIndicator()));
+
     // Empty State
     if (_lands.isEmpty) {
       return Container(
@@ -421,14 +490,17 @@ class _HomeContentState extends State<_HomeContent> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.add_location_alt_outlined, size: 40, color: Colors.grey),
+            const Icon(Icons.add_location_alt_outlined,
+                size: 40, color: Colors.grey),
             const SizedBox(height: 8),
-            Text("Belum ada lahan", style: GoogleFonts.inter(color: Colors.grey[600])),
+            Text("Belum ada lahan",
+                style: GoogleFonts.inter(color: Colors.grey[600])),
             TextButton(
               onPressed: () {
                 // Navigate to Add Land
               },
-              child: const Text("Tambahkan Lahan", style: TextStyle(color: Color(0xFF0A3D2F))),
+              child: const Text("Tambahkan Lahan",
+                  style: TextStyle(color: Color(0xFF0A3D2F))),
             )
           ],
         ),
@@ -445,8 +517,9 @@ class _HomeContentState extends State<_HomeContent> {
         itemBuilder: (context, index) {
           final land = _lands[index];
           // Use a static map placeholder or land image if available
-          final imageUrl = land.imageUrl ?? 'https://api.mapbox.com/styles/v1/mapbox/satellite-v9/static/112.7521,-7.2575,15,0/400x400?access_token=pk.eyJ1IjoiZGVtb3VzZXIiLCJhIjoiY2w4Z3M5bHMyMDJmMQN1b3h5b3MifQ.placeholder';
-          
+          final imageUrl = land.imageUrl ??
+              'https://api.mapbox.com/styles/v1/mapbox/satellite-v9/static/112.7521,-7.2575,15,0/400x400?access_token=pk.eyJ1IjoiZGVtb3VzZXIiLCJhIjoiY2w4Z3M5bHMyMDJmMQN1b3h5b3MifQ.placeholder';
+
           return Container(
             width: 260,
             decoration: BoxDecoration(
@@ -467,13 +540,18 @@ class _HomeContentState extends State<_HomeContent> {
                     gradient: LinearGradient(
                       begin: Alignment.topCenter,
                       end: Alignment.bottomCenter,
-                      colors: [Colors.transparent, Colors.black.withOpacity(0.7)],
+                      colors: [
+                        Colors.transparent,
+                        Colors.black.withOpacity(0.7)
+                      ],
                     ),
                   ),
                 ),
                 // Card Content
                 Positioned(
-                  bottom: 12, left: 12, right: 12,
+                  bottom: 12,
+                  left: 12,
+                  right: 12,
                   child: Container(
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
@@ -489,7 +567,8 @@ class _HomeContentState extends State<_HomeContent> {
                             color: Colors.white.withOpacity(0.1),
                             shape: BoxShape.circle,
                           ),
-                          child: const Icon(Icons.location_on, color: Colors.white, size: 18),
+                          child: const Icon(Icons.location_on,
+                              color: Colors.white, size: 18),
                         ),
                         const SizedBox(width: 12),
                         Expanded(
@@ -497,13 +576,17 @@ class _HomeContentState extends State<_HomeContent> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                land.name, 
-                                style: GoogleFonts.inter(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14),
+                                land.name,
+                                style: GoogleFonts.inter(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 14),
                                 overflow: TextOverflow.ellipsis,
                               ),
                               Text(
-                                '${land.areaSize} ha  •  ${land.location ?? 'Unknown'}', 
-                                style: GoogleFonts.inter(color: Colors.white70, fontSize: 10),
+                                '${land.areaSize} ha  •  ${land.location ?? 'Unknown'}',
+                                style: GoogleFonts.inter(
+                                    color: Colors.white70, fontSize: 10),
                                 overflow: TextOverflow.ellipsis,
                               ),
                             ],
@@ -522,7 +605,7 @@ class _HomeContentState extends State<_HomeContent> {
   }
 
   Widget _buildFilterChips() {
-    final filters = ['All', 'Beginner', 'Intermediet', 'Advanced'];
+    final filters = ['All', 'Beginner', 'Intermediate', 'Advanced'];
     return SizedBox(
       height: 36,
       child: ListView.separated(
@@ -539,7 +622,9 @@ class _HomeContentState extends State<_HomeContent> {
               padding: const EdgeInsets.symmetric(horizontal: 20),
               alignment: Alignment.center,
               decoration: BoxDecoration(
-                color: isSelected ? const Color(0xFF0A3D2F) : const Color(0xFFF2F4F3),
+                color: isSelected
+                    ? const Color(0xFF0A3D2F)
+                    : const Color(0xFFF2F4F3),
                 borderRadius: BorderRadius.circular(24),
               ),
               child: Text(
@@ -558,29 +643,48 @@ class _HomeContentState extends State<_HomeContent> {
   }
 
   Widget _buildVideoList() {
-    if (_isLoading) return const SizedBox(height: 100, child: Center(child: CircularProgressIndicator()));
-    
-    final filteredVideos = _selectedDifficulty == 'All' 
-        ? _videos 
-        : _videos.where((v) => (v['difficulty'] as String?)?.toLowerCase() == _selectedDifficulty.toLowerCase()).toList();
+  if (_isLoading) {
+    return const SizedBox(height: 100, child: Center(child: CircularProgressIndicator()));
+  }
 
-    if (filteredVideos.isEmpty) {
-      return Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16),
-        child: Text("Tidak ada video untuk kategori ini.", style: GoogleFonts.inter(color: Colors.grey)),
-      );
-    }
+  // filter
+  final filteredVideos = _selectedDifficulty == 'All'
+      ? _videos
+      : _videos.where((v) {
+          final diff = (v['difficulty'] ?? '').toString().trim().toLowerCase();
+          return diff == _selectedDifficulty.trim().toLowerCase();
+        }).toList();
 
-    return SizedBox(
-      height: 210,
-      child: ListView.separated(
-        padding: const EdgeInsets.symmetric(horizontal: 16),
-        scrollDirection: Axis.horizontal,
-        itemCount: filteredVideos.length,
-        separatorBuilder: (_, __) => const SizedBox(width: 16),
-        itemBuilder: (context, index) {
-          final video = filteredVideos[index];
-          return SizedBox(
+  if (filteredVideos.isEmpty) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: Text("Tidak ada video untuk kategori ini.", style: GoogleFonts.inter(color: Colors.grey)),
+    );
+  }
+
+  return SizedBox(
+    height: 210,
+    child: ListView.separated(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      scrollDirection: Axis.horizontal,
+      itemCount: filteredVideos.length,
+      separatorBuilder: (_, __) => const SizedBox(width: 16),
+      itemBuilder: (context, index) {
+        final video = filteredVideos[index];
+
+        final int contentId = (video['id'] as num).toInt();
+        final thumb = _resolveVideoThumbnail(video);
+
+        return InkWell(
+          borderRadius: BorderRadius.circular(16),
+          onTap: () {
+            Navigator.pushNamed(
+              context,
+              AppRoutes.educationalDetail,
+              arguments: {'id': contentId},
+            );
+          },
+          child: SizedBox(
             width: 240,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -591,21 +695,27 @@ class _HomeContentState extends State<_HomeContent> {
                     alignment: Alignment.center,
                     children: [
                       Image.network(
-                        video['thumbnail_url'] ?? 'https://via.placeholder.com/240x135',
-                        height: 135, width: 240, fit: BoxFit.cover,
-                        errorBuilder: (c, o, s) => Container(height: 135, color: Colors.grey[300]),
+                        thumb,
+                        height: 135,
+                        width: 240,
+                        fit: BoxFit.cover,
+                        errorBuilder: (c, o, s) =>
+                            Container(height: 135, width: 240, color: Colors.grey[300]),
                       ),
                       Container(
                         padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(color: Colors.black.withOpacity(0.3), shape: BoxShape.circle),
+                        decoration: BoxDecoration(
+                          color: Colors.black.withOpacity(0.3),
+                          shape: BoxShape.circle,
+                        ),
                         child: const Icon(Icons.play_arrow_rounded, color: Colors.white, size: 24),
-                      )
+                      ),
                     ],
                   ),
                 ),
                 const SizedBox(height: 10),
                 Text(
-                  video['title'] ?? 'Judul Video',
+                  (video['title'] ?? 'Judul Video').toString(),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: GoogleFonts.inter(fontWeight: FontWeight.bold, fontSize: 14),
@@ -613,21 +723,25 @@ class _HomeContentState extends State<_HomeContent> {
                 const SizedBox(height: 4),
                 Row(
                   children: [
-                    Text('Free', style: GoogleFonts.inter(fontSize: 11, color: AppColors.green, fontWeight: FontWeight.bold)),
+                    Text('Free',
+                        style: GoogleFonts.inter(
+                            fontSize: 11, color: AppColors.green, fontWeight: FontWeight.bold)),
                     const SizedBox(width: 8),
                     const Icon(Icons.star_rounded, size: 14, color: Colors.amber),
                     Text(' 4.5', style: GoogleFonts.inter(fontSize: 11, color: Colors.grey[700])),
                     const SizedBox(width: 8),
                     Text('|  12k Views', style: GoogleFonts.inter(fontSize: 11, color: Colors.grey[500])),
                   ],
-                )
+                ),
               ],
             ),
-          );
-        },
-      ),
-    );
-  }
+          ),
+        );
+      },
+    ),
+  );
+}
+
 
   Widget _buildArticleList() {
     if (_articles.isEmpty) return const SizedBox();
@@ -647,16 +761,25 @@ class _HomeContentState extends State<_HomeContent> {
               color: Colors.white,
               borderRadius: BorderRadius.circular(16),
               border: Border.all(color: Colors.grey[100]!),
-              boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 10, offset: const Offset(0, 4))],
+              boxShadow: [
+                BoxShadow(
+                    color: Colors.black.withOpacity(0.03),
+                    blurRadius: 10,
+                    offset: const Offset(0, 4))
+              ],
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 ClipRRect(
-                  borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+                  borderRadius:
+                      const BorderRadius.vertical(top: Radius.circular(16)),
                   child: Image.network(
-                    article['thumbnail_url'] ?? 'https://via.placeholder.com/260x140',
-                    height: 120, width: double.infinity, fit: BoxFit.cover,
+                    article['thumbnail_url'] ??
+                        'https://via.placeholder.com/260x140',
+                    height: 120,
+                    width: double.infinity,
+                    fit: BoxFit.cover,
                   ),
                 ),
                 Padding(
@@ -668,14 +791,20 @@ class _HomeContentState extends State<_HomeContent> {
                         article['title'] ?? 'Artikel Pertanian',
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
-                        style: GoogleFonts.inter(fontWeight: FontWeight.bold, fontSize: 13, height: 1.4),
+                        style: GoogleFonts.inter(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 13,
+                            height: 1.4),
                       ),
                       const SizedBox(height: 8),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text('5 min read', style: GoogleFonts.inter(fontSize: 10, color: Colors.grey)),
-                          const Icon(Icons.bookmark_border_rounded, size: 18, color: Colors.grey),
+                          Text('5 min read',
+                              style: GoogleFonts.inter(
+                                  fontSize: 10, color: Colors.grey)),
+                          const Icon(Icons.bookmark_border_rounded,
+                              size: 18, color: Colors.grey),
                         ],
                       )
                     ],
