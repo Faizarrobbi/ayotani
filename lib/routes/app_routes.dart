@@ -12,6 +12,11 @@ import '../pages/marketplace/payment_done.dart';
 import '../pages/marketplace/payment_method.dart';
 import '../pages/education/educational_list_screen.dart';
 import '../pages/education/educational_detail_screen.dart';
+import '../pages/profile/profile_page.dart';
+import '../pages/profile/edit_profile_screen.dart';
+import '../pages/profile/change_password_screen.dart';
+import '../pages/profile/notification_screen.dart';
+import '../pages/profile/terms_screen.dart';
 
 class AppRoutes {
   static const splash = '/splash';
@@ -27,6 +32,11 @@ class AppRoutes {
   static const paymentDone = '/payment-done';
   static const educational = '/educational';
   static const educationalDetail = '/educational-detail';
+  static const profile = '/profile';
+  static const editProfile = '/edit-profile';
+  static const changePassword = '/change-password';
+  static const notifications = '/notifications';
+  static const terms = '/terms';
 
   static Map<String, WidgetBuilder> get routes => {
         splash: (_) => const SplashScreen(),
@@ -37,6 +47,7 @@ class AppRoutes {
           return OnboardingPage(userId: userId ?? '');
         },
         home: (_) => const HomeScreen(),
+        profile: (_) => const ProfilePage(),
         marketplace: (_) => const MarketplaceScreen(),
         cart: (_) => const ShoppingCartScreen(),
         checkout: (_) => const CheckoutScreen(),
@@ -57,5 +68,9 @@ class AppRoutes {
           final id = args?['id'] as int? ?? 0;
           return EducationalDetailScreen(contentId: id);
         },
+        editProfile: (_) => const EditProfileScreen(),
+        changePassword: (_) => const ChangePasswordScreen(),
+        notifications: (_) => const NotificationScreen(),
+        terms: (_) => const TermsScreen(),
       };
 }

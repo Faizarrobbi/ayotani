@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'package:google_fonts/google_fonts.dart'; // Assuming you have this package based on other files
+import 'package:google_fonts/google_fonts.dart';
 
 import '../../providers/auth_provider.dart';
 import '../../theme/app_colors.dart';
@@ -14,6 +14,8 @@ import '../../routes/app_routes.dart';
 import '../monitoring/monitoring_screen.dart';
 import '../marketplace/marketplace_screen.dart';
 import '../community/community_screen.dart';
+// IMPORT INI PENTING AGAR PROFILE TIDAK KOSONG
+import '../profile/profile_page.dart'; 
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -46,7 +48,7 @@ class _HomeScreenState extends State<HomeScreen> {
       body: Consumer<AuthProvider>(
         builder: (context, authProvider, _) {
           final profile = authProvider.userProfile;
-          // Only Home Content (Index 0) is complex, others are standard screens
+          // Only Home Content (Index 0) is complex
           if (_selectedIndex == 0) {
             return _HomeContent(userProfile: profile);
           }
@@ -85,12 +87,12 @@ class _HomeScreenState extends State<HomeScreen> {
       case 1:
         return const MarketplaceScreen();
       case 2:
-        return const MonitoringScreen(); // "Plant" maps to Monitoring
+        return const MonitoringScreen();
       case 3:
         return const CommunityScreen();
       case 4:
-        return const Center(
-            child: Text("Profile Screen")); // Placeholder for Profile
+        // PERBAIKAN 1: Panggil ProfilePage, bukan Text placeholder
+        return const ProfilePage(); 
       default:
         return const SizedBox();
     }
@@ -114,25 +116,23 @@ class _HomeContentState extends State<_HomeContent> {
     final url = (video['video_url'] as String?)?.trim() ?? '';
     final id = _youtubeIdFromUrl(url);
     if (id != null) {
-      // maxres kadang tidak ada, tapi cukup oke untuk start
       return 'https://img.youtube.com/vi/$id/maxresdefault.jpg';
     }
 
     return 'https://via.placeholder.com/240x135';
-}
+  }
 
-String? _youtubeIdFromUrl(String url) {
-  // support: https://www.youtube.com/watch?v=xxxx  /  https://youtu.be/xxxx
-  final reg1 = RegExp(r'v=([a-zA-Z0-9_-]{6,})');
-  final m1 = reg1.firstMatch(url);
-  if (m1 != null) return m1.group(1);
+  String? _youtubeIdFromUrl(String url) {
+    final reg1 = RegExp(r'v=([a-zA-Z0-9_-]{6,})');
+    final m1 = reg1.firstMatch(url);
+    if (m1 != null) return m1.group(1);
 
-  final reg2 = RegExp(r'youtu\.be\/([a-zA-Z0-9_-]{6,})');
-  final m2 = reg2.firstMatch(url);
-  if (m2 != null) return m2.group(1);
+    final reg2 = RegExp(r'youtu\.be\/([a-zA-Z0-9_-]{6,})');
+    final m2 = reg2.firstMatch(url);
+    if (m2 != null) return m2.group(1);
 
-  return null;
-}
+    return null;
+  }
 
   // Data State
   Map<String, dynamic>? _weatherData;
@@ -152,7 +152,6 @@ String? _youtubeIdFromUrl(String url) {
     final userId = Supabase.instance.client.auth.currentUser?.id;
     if (userId == null) return;
 
-    // 1. Fetch Lands (We need this first to get location for weather)
     final landsResponse = await Supabase.instance.client
         .from('lands')
         .select()
@@ -162,23 +161,17 @@ String? _youtubeIdFromUrl(String url) {
     List<Land> lands =
         (landsResponse as List).map((e) => Land.fromJson(e)).toList();
 
-    // 2. Fetch Weather based on first land or default to Surabaya
-    // Coordinates for Surabaya: -7.2575, 112.7521
-    // Ideally, Land model has lat/long. Assuming default for now.
     _fetchWeather(-7.2575, 112.7521);
 
-    // 3. Fetch Videos (Educational Content)
-    // Assuming 'type' column exists or using 'difficulty' to differentiate
     final videosResponse = await Supabase.instance.client
         .from('educational_content')
         .select()
         .limit(5);
 
-    // 4. Fetch Articles (For now, reusing educational content, ideally fetch from 'articles' table)
     final articlesResponse = await Supabase.instance.client
         .from('educational_content')
         .select()
-        .order('created_at', ascending: true) // Just to show different items
+        .order('created_at', ascending: true)
         .limit(5);
 
     if (mounted) {
@@ -193,7 +186,6 @@ String? _youtubeIdFromUrl(String url) {
 
   Future<void> _fetchWeather(double lat, double long) async {
     try {
-      // Using Open-Meteo for detailed data (Temp, Humidity, Rain, Wind)
       final url = Uri.parse(
           'https://api.open-meteo.com/v1/forecast?latitude=$lat&longitude=$long&current=temperature_2m,relative_humidity_2m,precipitation,wind_speed_10m&timezone=auto');
       final response = await http.get(url);
@@ -220,10 +212,8 @@ String? _youtubeIdFromUrl(String url) {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // 1. HEADER SECTION
           _buildCustomHeader(name, level, gems),
 
-          // 2. WEATHER WIDGET
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: _buildWeatherCard(),
@@ -231,16 +221,17 @@ String? _youtubeIdFromUrl(String url) {
 
           const SizedBox(height: 24),
 
-          // 3. LAHAN PERTANIAN
+          // PERBAIKAN 2: "See All" Lahan sekarang memunculkan pesan (atau bisa navigasi)
           _buildSectionHeader('Lahan Pertanian', () {
-            // Navigate to full list
+             ScaffoldMessenger.of(context).showSnackBar(
+               const SnackBar(content: Text("Fitur Daftar Semua Lahan akan segera hadir!")),
+             );
           }),
           const SizedBox(height: 12),
           _buildLandList(),
 
           const SizedBox(height: 24),
 
-          // 4. VIDEO BELAJAR
           _buildSectionHeader('Video Belajar', () {
             Navigator.pushNamed(context, AppRoutes.educational);
           }),
@@ -252,8 +243,10 @@ String? _youtubeIdFromUrl(String url) {
 
           const SizedBox(height: 24),
 
-          // 5. TOP ARTICLES
-          _buildSectionHeader('Top Articles', () {}),
+          // PERBAIKAN 3: "See All" Articles diarahkan ke halaman edukasi juga
+          _buildSectionHeader('Top Articles', () {
+             Navigator.pushNamed(context, AppRoutes.educational);
+          }),
           const SizedBox(height: 12),
           _buildArticleList(),
 
@@ -272,7 +265,7 @@ String? _youtubeIdFromUrl(String url) {
           width: double.infinity,
           height: 220,
           decoration: const BoxDecoration(
-            color: Color(0xFF0A3D2F), // Dark Green
+            color: Color(0xFF0A3D2F),
             borderRadius: BorderRadius.vertical(bottom: Radius.circular(32)),
           ),
         ),
@@ -333,19 +326,18 @@ String? _youtubeIdFromUrl(String url) {
                   ),
                 ),
                 const SizedBox(height: 24),
-                // Search Bar
                 Container(
                   height: 48,
                   decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(12),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.05),
-                          blurRadius: 10,
-                          offset: const Offset(0, 4),
-                        )
-                      ]),
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(12),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.05),
+                        blurRadius: 10,
+                        offset: const Offset(0, 4),
+                      )
+                    ]),
                   child: TextField(
                     decoration: InputDecoration(
                       prefixIcon: const Icon(Icons.search, color: Colors.grey),
@@ -377,7 +369,7 @@ String? _youtubeIdFromUrl(String url) {
         borderRadius: BorderRadius.circular(20),
         image: const DecorationImage(
           image: NetworkImage(
-              'https://images.unsplash.com/photo-1534088568595-a066f410bcda?auto=format&fit=crop&w=800&q=80'), // Scenic field
+              'https://images.unsplash.com/photo-1534088568595-a066f410bcda?auto=format&fit=crop&w=800&q=80'),
           fit: BoxFit.cover,
           colorFilter: ColorFilter.mode(Colors.black26, BlendMode.darken),
         ),
@@ -473,11 +465,11 @@ String? _youtubeIdFromUrl(String url) {
   }
 
   Widget _buildLandList() {
-    if (_isLoading)
+    if (_isLoading) {
       return const SizedBox(
           height: 180, child: Center(child: CircularProgressIndicator()));
+    }
 
-    // Empty State
     if (_lands.isEmpty) {
       return Container(
         height: 150,
@@ -516,7 +508,6 @@ String? _youtubeIdFromUrl(String url) {
         separatorBuilder: (_, __) => const SizedBox(width: 12),
         itemBuilder: (context, index) {
           final land = _lands[index];
-          // Use a static map placeholder or land image if available
           final imageUrl = land.imageUrl ??
               'https://api.mapbox.com/styles/v1/mapbox/satellite-v9/static/112.7521,-7.2575,15,0/400x400?access_token=pk.eyJ1IjoiZGVtb3VzZXIiLCJhIjoiY2w4Z3M5bHMyMDJmMQN1b3h5b3MifQ.placeholder';
 
@@ -528,12 +519,11 @@ String? _youtubeIdFromUrl(String url) {
               image: DecorationImage(
                 image: NetworkImage(imageUrl),
                 fit: BoxFit.cover,
-                onError: (e, s) {}, // Handle error silently
+                onError: (e, s) {}, 
               ),
             ),
             child: Stack(
               children: [
-                // Gradient Overlay
                 Container(
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(16),
@@ -547,7 +537,6 @@ String? _youtubeIdFromUrl(String url) {
                     ),
                   ),
                 ),
-                // Card Content
                 Positioned(
                   bottom: 12,
                   left: 12,
@@ -643,105 +632,102 @@ String? _youtubeIdFromUrl(String url) {
   }
 
   Widget _buildVideoList() {
-  if (_isLoading) {
-    return const SizedBox(height: 100, child: Center(child: CircularProgressIndicator()));
-  }
+    if (_isLoading) {
+      return const SizedBox(height: 100, child: Center(child: CircularProgressIndicator()));
+    }
 
-  // filter
-  final filteredVideos = _selectedDifficulty == 'All'
-      ? _videos
-      : _videos.where((v) {
-          final diff = (v['difficulty'] ?? '').toString().trim().toLowerCase();
-          return diff == _selectedDifficulty.trim().toLowerCase();
-        }).toList();
+    final filteredVideos = _selectedDifficulty == 'All'
+        ? _videos
+        : _videos.where((v) {
+            final diff = (v['difficulty'] ?? '').toString().trim().toLowerCase();
+            return diff == _selectedDifficulty.trim().toLowerCase();
+          }).toList();
 
-  if (filteredVideos.isEmpty) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: Text("Tidak ada video untuk kategori ini.", style: GoogleFonts.inter(color: Colors.grey)),
-    );
-  }
+    if (filteredVideos.isEmpty) {
+      return Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        child: Text("Tidak ada video untuk kategori ini.", style: GoogleFonts.inter(color: Colors.grey)),
+      );
+    }
 
-  return SizedBox(
-    height: 210,
-    child: ListView.separated(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      scrollDirection: Axis.horizontal,
-      itemCount: filteredVideos.length,
-      separatorBuilder: (_, __) => const SizedBox(width: 16),
-      itemBuilder: (context, index) {
-        final video = filteredVideos[index];
+    return SizedBox(
+      height: 210,
+      child: ListView.separated(
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        scrollDirection: Axis.horizontal,
+        itemCount: filteredVideos.length,
+        separatorBuilder: (_, __) => const SizedBox(width: 16),
+        itemBuilder: (context, index) {
+          final video = filteredVideos[index];
+          final int contentId = (video['id'] as num).toInt();
+          final thumb = _resolveVideoThumbnail(video);
 
-        final int contentId = (video['id'] as num).toInt();
-        final thumb = _resolveVideoThumbnail(video);
-
-        return InkWell(
-          borderRadius: BorderRadius.circular(16),
-          onTap: () {
-            Navigator.pushNamed(
-              context,
-              AppRoutes.educationalDetail,
-              arguments: {'id': contentId},
-            );
-          },
-          child: SizedBox(
-            width: 240,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(16),
-                  child: Stack(
-                    alignment: Alignment.center,
-                    children: [
-                      Image.network(
-                        thumb,
-                        height: 135,
-                        width: 240,
-                        fit: BoxFit.cover,
-                        errorBuilder: (c, o, s) =>
-                            Container(height: 135, width: 240, color: Colors.grey[300]),
-                      ),
-                      Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          color: Colors.black.withOpacity(0.3),
-                          shape: BoxShape.circle,
+          return InkWell(
+            borderRadius: BorderRadius.circular(16),
+            onTap: () {
+              Navigator.pushNamed(
+                context,
+                AppRoutes.educationalDetail,
+                arguments: {'id': contentId},
+              );
+            },
+            child: SizedBox(
+              width: 240,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(16),
+                    child: Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        Image.network(
+                          thumb,
+                          height: 135,
+                          width: 240,
+                          fit: BoxFit.cover,
+                          errorBuilder: (c, o, s) =>
+                              Container(height: 135, width: 240, color: Colors.grey[300]),
                         ),
-                        child: const Icon(Icons.play_arrow_rounded, color: Colors.white, size: 24),
-                      ),
+                        Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: Colors.black.withOpacity(0.3),
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(Icons.play_arrow_rounded, color: Colors.white, size: 24),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  Text(
+                    (video['title'] ?? 'Judul Video').toString(),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: GoogleFonts.inter(fontWeight: FontWeight.bold, fontSize: 14),
+                  ),
+                  const SizedBox(height: 4),
+                  Row(
+                    children: [
+                      Text('Free',
+                          style: GoogleFonts.inter(
+                              fontSize: 11, color: AppColors.green, fontWeight: FontWeight.bold)),
+                      const SizedBox(width: 8),
+                      const Icon(Icons.star_rounded, size: 14, color: Colors.amber),
+                      Text(' 4.5', style: GoogleFonts.inter(fontSize: 11, color: Colors.grey[700])),
+                      const SizedBox(width: 8),
+                      Text('|  12k Views', style: GoogleFonts.inter(fontSize: 11, color: Colors.grey[500])),
                     ],
                   ),
-                ),
-                const SizedBox(height: 10),
-                Text(
-                  (video['title'] ?? 'Judul Video').toString(),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: GoogleFonts.inter(fontWeight: FontWeight.bold, fontSize: 14),
-                ),
-                const SizedBox(height: 4),
-                Row(
-                  children: [
-                    Text('Free',
-                        style: GoogleFonts.inter(
-                            fontSize: 11, color: AppColors.green, fontWeight: FontWeight.bold)),
-                    const SizedBox(width: 8),
-                    const Icon(Icons.star_rounded, size: 14, color: Colors.amber),
-                    Text(' 4.5', style: GoogleFonts.inter(fontSize: 11, color: Colors.grey[700])),
-                    const SizedBox(width: 8),
-                    Text('|  12k Views', style: GoogleFonts.inter(fontSize: 11, color: Colors.grey[500])),
-                  ],
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-        );
-      },
-    ),
-  );
-}
-
+          );
+        },
+      ),
+    );
+  }
 
   Widget _buildArticleList() {
     if (_articles.isEmpty) return const SizedBox();
