@@ -4,16 +4,16 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:intl/intl.dart';
 
+// Import untuk News Feature
+import 'routes/app_routes.dart';
+import 'pages/news/comments_page.dart';
+import 'models/comment_model.dart';
+
 // --- CONFIGURATION ---
-// I have turned off mock data. The app will now attempt to connect to your real database.
 const bool useMockData = false; 
 
 // YOUR SUPABASE CREDENTIALS
 const String supabaseUrl = 'https://djayruwdyfndnfskgtit.supabase.co';
-
-// WARNING: The key you provided appears to be a Publishable Key, not the standard JWT Anon Key.
-// If connection fails, replace this with the 'anon' 'public' key from Supabase Settings -> API.
-// It usually starts with "eyJ..."
 const String supabaseAnonKey = 'sb_publishable_lTBN1VXJKHhw19KIKlk9nA_jMSs0Kb2';
 
 void main() async {
@@ -31,8 +31,8 @@ void main() async {
 
 // --- DESIGN SYSTEM ---
 class AppColors {
-  static const Color primary = Color(0xFF0B6138); // Green
-  static const Color secondary = Color(0xFF0B5F61); // Teal
+  static const Color primary = Color(0xFF0B6138);
+  static const Color secondary = Color(0xFF0B5F61);
   static const Color background = Color(0xFFF5F5F5);
   static const Color textDark = Color(0xFF1A1A1A);
   static const Color textGrey = Color(0xFF757575);
@@ -65,7 +65,26 @@ class AyoTaniApp extends StatelessWidget {
         ),
         useMaterial3: true,
       ),
-      home: const MarketplaceScreen(),
+      
+      // Initial route
+      initialRoute: AppRoutes.marketplace,
+      
+      // Routes
+      routes: AppRoutes.routes,
+      
+      // Handle routes dengan arguments (untuk CommentsPage)
+      onGenerateRoute: (settings) {
+        if (settings.name == AppRoutes.comments) {
+          final args = settings.arguments as Map<String, dynamic>;
+          return MaterialPageRoute(
+            builder: (context) => CommentsPage(
+              comments: args['comments'] as List<Comment>,
+              commentCount: args['commentCount'] as int,
+            ),
+          );
+        }
+        return null;
+      },
     );
   }
 }
@@ -121,7 +140,7 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
   // Fetch logic
   Future<List<Product>> _fetchProducts() async {
     if (useMockData) {
-      await Future.delayed(const Duration(milliseconds: 800)); // Simulate net lag
+      await Future.delayed(const Duration(milliseconds: 800));
       return [
         Product(id: 1, name: 'Benih Tomat Cherry', description: 'Benih unggul tomat cherry merah manis, cocok untuk dataran rendah hingga tinggi. Masa panen 60-70 hari setelah tanam.', price: 15000, stock: 50, imageUrl: 'https://images.unsplash.com/photo-1592841200221-a6898f307baa?auto=format&fit=crop&q=80&w=400', category: 'Seeds', rating: 4.8),
         Product(id: 2, name: 'Pupuk Organik Cair', description: 'Mempercepat pertumbuhan daun dan akar. Terbuat dari bahan alami yang ramah lingkungan.', price: 45000, stock: 20, imageUrl: 'https://images.unsplash.com/photo-1585314062340-f1a5a7c9328d?auto=format&fit=crop&q=80&w=400', category: 'Nutrient', rating: 4.5),
@@ -132,9 +151,7 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
       final client = Supabase.instance.client;
       var query = client.from('products').select();
       
-      // Filter Logic
       if (selectedCategory != 'All') {
-        // Ensure category matches the Enum strings in database exactly
         query = query.eq('category', selectedCategory);
       }
       
@@ -142,7 +159,6 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
         final response = await query;
         return (response as List).map((e) => Product.fromJson(e)).toList();
       } catch (e) {
-        // Simple error handling for debugging
         debugPrint('Supabase Error: $e');
         rethrow;
       }
@@ -155,13 +171,23 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
       backgroundColor: Colors.white,
       body: CustomScrollView(
         slivers: [
-          // HEADER: App Bar & Search
+          // HEADER
           SliverAppBar(
             floating: true,
             pinned: true,
             backgroundColor: AppColors.primary,
             elevation: 0,
             title: Text('Marketplace', style: GoogleFonts.kanit(color: Colors.white, fontWeight: FontWeight.bold)),
+            actions: [
+              // Button untuk navigate ke News Article (untuk testing)
+              IconButton(
+                icon: const Icon(Icons.article, color: Colors.white),
+                onPressed: () {
+                  Navigator.pushNamed(context, AppRoutes.newsArticle);
+                },
+                tooltip: 'News Article',
+              ),
+            ],
             bottom: PreferredSize(
               preferredSize: const Size.fromHeight(70),
               child: Padding(
@@ -277,7 +303,6 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
                 return const SliverFillRemaining(child: Center(child: CircularProgressIndicator(color: AppColors.primary)));
               }
               if (snapshot.hasError) {
-                // Better error visualization
                 return SliverFillRemaining(
                   child: Center(
                     child: Padding(
@@ -294,8 +319,6 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
                             textAlign: TextAlign.center,
                             style: GoogleFonts.inter(fontSize: 12, color: Colors.grey),
                           ),
-                          const SizedBox(height: 10),
-                          Text('Check your API Key in main.dart', style: GoogleFonts.inter(fontWeight: FontWeight.bold, color: Colors.red)),
                         ],
                       ),
                     ),
@@ -362,7 +385,6 @@ class ProductCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Image
             Expanded(
               flex: 3,
               child: ClipRRect(
@@ -382,7 +404,6 @@ class ProductCard extends StatelessWidget {
                 ),
               ),
             ),
-            // Details
             Expanded(
               flex: 2,
               child: Padding(
@@ -465,17 +486,14 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Category Tag
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                         decoration: BoxDecoration(color: AppColors.secondary.withOpacity(0.1), borderRadius: BorderRadius.circular(5)),
                         child: Text(widget.product.category, style: GoogleFonts.inter(color: AppColors.secondary, fontWeight: FontWeight.w600, fontSize: 12)),
                       ),
                       const SizedBox(height: 10),
-                      // Title
                       Text(widget.product.name, style: GoogleFonts.kanit(fontSize: 24, fontWeight: FontWeight.bold, color: AppColors.textDark)),
                       const SizedBox(height: 5),
-                      // Rating & Stock
                       Row(
                         children: [
                           const Icon(Icons.star, color: Colors.amber, size: 18),
@@ -486,24 +504,20 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                         ],
                       ),
                       const SizedBox(height: 20),
-                      // Price
                       Text(formatCurrency.format(widget.product.price), style: GoogleFonts.kanit(fontSize: 26, fontWeight: FontWeight.bold, color: AppColors.primary)),
                       const SizedBox(height: 20),
                       const Divider(),
                       const SizedBox(height: 10),
-                      // Description
                       Text('Deskripsi Produk', style: GoogleFonts.kanit(fontSize: 18, fontWeight: FontWeight.w600)),
                       const SizedBox(height: 8),
                       Text(widget.product.description, style: GoogleFonts.inter(fontSize: 14, height: 1.5, color: Colors.grey.shade700)),
-                      const SizedBox(height: 100), // Spacing for bottom bar
+                      const SizedBox(height: 100),
                     ],
                   ),
                 ),
               ),
             ],
           ),
-
-          // BOTTOM BAR
           Positioned(
             bottom: 0,
             left: 0,
@@ -516,7 +530,6 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
               ),
               child: Row(
                 children: [
-                  // Quantity Selector
                   Container(
                     decoration: BoxDecoration(border: Border.all(color: Colors.grey.shade300), borderRadius: BorderRadius.circular(8)),
                     child: Row(
@@ -528,7 +541,6 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                     ),
                   ),
                   const SizedBox(width: 15),
-                  // Add to Cart Button
                   Expanded(
                     child: ElevatedButton(
                       onPressed: () {
