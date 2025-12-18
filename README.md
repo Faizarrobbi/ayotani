@@ -126,8 +126,3 @@ Proyek ini dikembangkan oleh **Kelompok 09 - Kelas B** Departemen Sistem Informa
 <div align="center">
   <small>Dikembangkan dengan ❤️ untuk Pertanian Indonesia</small>
 </div>
-
-### Tips Tambahan untuk Tampilan Github:
-
-1. **Logo:** Pastikan Anda mengupload file logo aplikasi ke dalam folder `assets/` di repo Anda dan beri nama `logo.png` agar gambar di bagian paling atas muncul. Jika belum ada, Anda bisa menghapus bagian `<img>` tersebut.
-2. **Screenshots:** Sangat disarankan menambahkan bagian "Screenshots" setelah bagian "Fitur" untuk menampilkan tampilan aplikasi (misal: Halaman Login, Dashboard, Peta, dan Edukasi) agar orang yang berkunjung langsung paham visual aplikasinya.
