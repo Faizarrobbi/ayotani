@@ -125,9 +125,7 @@ class ProfilePage extends StatelessWidget {
                   iconColor: const Color(0xFF4CAF50),
                   bgColor: const Color(0xFFE8F5E9),
                   onTap: () {
-                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text("Hubungi CS di: support@ayotani.com")),
-                    );
+                     Navigator.pushNamed(context, AppRoutes.customerService);
                   },
                 ),
 

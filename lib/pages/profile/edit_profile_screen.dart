@@ -20,7 +20,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   @override
   void initState() {
     super.initState();
-    // Isi form dengan data saat ini
+    // Ambil data user
     final userProfile = Provider.of<AuthProvider>(context, listen: false).userProfile;
     final currentUser = Supabase.instance.client.auth.currentUser;
     
@@ -32,37 +32,23 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     setState(() => _isLoading = true);
     try {
       final supabase = Supabase.instance.client;
-      final userId = supabase.auth.currentUser!.id;
-      final newName = _nameController.text.trim();
       final newEmail = _emailController.text.trim();
 
-      // 1. Update Nama di tabel 'profiles'
-      if (newName.isNotEmpty) {
-        await supabase
-            .from('profiles')
-            .update({'username': newName})
-            .eq('user_id', userId);
-      }
-
-      // 2. Update Email di Auth (Jika berubah)
-      // CATATAN: Supabase biasanya mengirim email konfirmasi ke email baru 
-      // sebelum perubahan efektif, tergantung settingan di dashboard Supabase Anda.
+      // Hanya update Email karena Nama & Gambar di-lock (read-only)
       if (newEmail.isNotEmpty && newEmail != supabase.auth.currentUser?.email) {
         await supabase.auth.updateUser(UserAttributes(email: newEmail));
         if (mounted) {
            ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Email diperbarui! Silakan cek inbox email baru Anda untuk konfirmasi.')),
+            const SnackBar(content: Text('Email diperbarui! Cek inbox email baru Anda untuk konfirmasi.')),
+          );
+           Navigator.pop(context);
+        }
+      } else {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Tidak ada perubahan yang disimpan.')),
           );
         }
-      }
-
-      // 3. Refresh data di aplikasi agar UI berubah
-      if (mounted) {
-        await Provider.of<AuthProvider>(context, listen: false).loadUserProfile();
-        Navigator.pop(context); // Kembali ke menu profil
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Profil berhasil diperbarui')),
-        );
       }
     } catch (e) {
       if (mounted) {
@@ -75,22 +61,57 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // Ambil URL avatar untuk ditampilkan
+    final userProfile = Provider.of<AuthProvider>(context).userProfile;
+    final avatarUrl = userProfile?.avatarUrl;
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: Text('Edit Profil', style: GoogleFonts.inter(color: Colors.black)),
+        title: Text('Profil Saya', style: GoogleFonts.inter(color: Colors.black)),
         backgroundColor: Colors.white,
         elevation: 0,
         iconTheme: const IconThemeData(color: Colors.black),
       ),
-      body: Padding(
+      body: SingleChildScrollView(
         padding: const EdgeInsets.all(24.0),
         child: Column(
           children: [
-            _buildTextField("Nama Lengkap", _nameController, Icons.person),
+            // --- 1. Tampilan Gambar (Read Only) ---
+            Center(
+              child: CircleAvatar(
+                radius: 50,
+                backgroundColor: Colors.grey[200],
+                backgroundImage: (avatarUrl != null && avatarUrl.isNotEmpty)
+                    ? NetworkImage(avatarUrl)
+                    : null,
+                child: (avatarUrl == null || avatarUrl.isEmpty)
+                    ? Icon(Icons.person, size: 50, color: Colors.grey[400])
+                    : null,
+              ),
+            ),
+            const SizedBox(height: 30),
+
+            // --- 2. Nama (Read Only / Locked) ---
+            _buildTextField(
+              "Nama Lengkap", 
+              _nameController, 
+              Icons.person, 
+              isReadOnly: true // Dikunci
+            ),
             const SizedBox(height: 20),
-            _buildTextField("Email", _emailController, Icons.email),
+
+            // --- 3. Email (Bisa Diedit) ---
+            _buildTextField(
+              "Email", 
+              _emailController, 
+              Icons.email,
+              isReadOnly: false // Bisa diubah
+            ),
+            
             const SizedBox(height: 40),
+
+            // --- 4. Tombol Simpan ---
             SizedBox(
               width: double.infinity,
               height: 50,
@@ -102,7 +123,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 ),
                 child: _isLoading
                     ? const CircularProgressIndicator(color: Colors.white)
-                    : Text("Simpan Perubahan", style: GoogleFonts.inter(color: Colors.white, fontWeight: FontWeight.bold)),
+                    : Text("Simpan Perubahan Email", style: GoogleFonts.inter(color: Colors.white, fontWeight: FontWeight.bold)),
               ),
             ),
           ],
@@ -111,7 +132,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     );
   }
 
-  Widget _buildTextField(String label, TextEditingController controller, IconData icon) {
+  Widget _buildTextField(String label, TextEditingController controller, IconData icon, {required bool isReadOnly}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -119,15 +140,31 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         const SizedBox(height: 8),
         TextField(
           controller: controller,
+          readOnly: isReadOnly, // Kunci field jika readOnly true
+          style: TextStyle(color: isReadOnly ? Colors.grey[600] : Colors.black),
           decoration: InputDecoration(
-            prefixIcon: Icon(icon, color: Colors.grey),
+            prefixIcon: Icon(icon, color: isReadOnly ? Colors.grey : Colors.black54),
+            filled: isReadOnly,
+            fillColor: isReadOnly ? Colors.grey[100] : Colors.white, // Warna abu jika dikunci
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide(color: isReadOnly ? Colors.transparent : Colors.grey),
+            ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide(color: AppColors.green, width: 2),
+              borderSide: BorderSide(color: isReadOnly ? Colors.transparent : AppColors.green, width: 2),
             ),
           ),
         ),
+        if (isReadOnly)
+          Padding(
+            padding: const EdgeInsets.only(top: 4, left: 4),
+            child: Text(
+              "*Nama tidak dapat diubah.",
+              style: GoogleFonts.inter(fontSize: 10, color: Colors.grey, fontStyle: FontStyle.italic),
+            ),
+          ),
       ],
     );
   }

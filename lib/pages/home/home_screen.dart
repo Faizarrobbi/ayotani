@@ -6,7 +6,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 
 import '../../providers/auth_provider.dart';
-import '../../theme/app_colors.dart';
 import '../../models/land_model.dart';
 import '../../models/educational_content_model.dart'; 
 import '../../services/educational_service.dart'; 
@@ -101,8 +100,7 @@ class _HomeContentState extends State<_HomeContent> {
   Map<String, dynamic>? _weatherData;
   List<Land> _lands = [];
   List<EducationalContent> _videos = [];
-  List<EducationalContent> _articles = [];
-  String _selectedDifficulty = 'All';
+  List<EducationalContent> _articles = []; 
   bool _isLoading = true;
 
   @override
@@ -163,13 +161,12 @@ class _HomeContentState extends State<_HomeContent> {
   @override
   Widget build(BuildContext context) {
     final name = widget.userProfile?.username ?? 'Petani';
-    // Removed gems and level variables
 
     return SingleChildScrollView(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildCustomHeader(name), // Removed level/gems arguments
+          _buildCustomHeader(name), 
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: _buildWeatherCard(),
@@ -211,7 +208,7 @@ class _HomeContentState extends State<_HomeContent> {
       children: [
         Container(
           width: double.infinity,
-          height: 200, // Slightly reduced height since we removed the gems row
+          height: 200, 
           decoration: const BoxDecoration(
             color: Color(0xFF0A3D2F),
             borderRadius: BorderRadius.vertical(bottom: Radius.circular(32)),
@@ -247,11 +244,10 @@ class _HomeContentState extends State<_HomeContent> {
                     const Icon(Icons.notifications_outlined, color: Colors.white, size: 28),
                   ],
                 ),
-                // Removed the Gems/Level Container here
                 const SizedBox(height: 24),
                 Container(
                   height: 48,
-                  decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12), boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, 4))]),
+                  decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12), boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 10, offset: const Offset(0, 4))]),
                   child: TextField(
                     decoration: InputDecoration(
                       prefixIcon: const Icon(Icons.search, color: Colors.grey),
@@ -294,7 +290,7 @@ class _HomeContentState extends State<_HomeContent> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text('$temp°', style: GoogleFonts.inter(color: Colors.white, fontSize: 40, fontWeight: FontWeight.bold, height: 1.0)),
-                  Text('Hari ini cukup cerah', style: GoogleFonts.inter(color: Colors.white.withOpacity(0.9), fontSize: 13)),
+                  Text('Hari ini cukup cerah', style: GoogleFonts.inter(color: Colors.white.withValues(alpha: 0.9), fontSize: 13)),
                 ],
               ),
             ],
@@ -345,7 +341,7 @@ class _HomeContentState extends State<_HomeContent> {
               ),
               child: Stack(
                 children: [
-                  Container(decoration: BoxDecoration(borderRadius: BorderRadius.circular(16), gradient: LinearGradient(colors: [Colors.transparent, Colors.black.withOpacity(0.7)], begin: Alignment.topCenter, end: Alignment.bottomCenter))),
+                  Container(decoration: BoxDecoration(borderRadius: BorderRadius.circular(16), gradient: LinearGradient(colors: [Colors.transparent, Colors.black.withValues(alpha: 0.7)], begin: Alignment.topCenter, end: Alignment.bottomCenter))),
                   Positioned(bottom: 12, left: 12, right: 12, child: Text(land.name, style: GoogleFonts.inter(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14))),
                 ],
               ),
@@ -418,7 +414,7 @@ class _HomeContentState extends State<_HomeContent> {
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(color: Colors.grey[100]!),
                 boxShadow: [
-                  BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 10, offset: const Offset(0, 4))
+                  BoxShadow(color: Colors.black.withValues(alpha: 0.03), blurRadius: 10, offset: const Offset(0, 4))
                 ],
               ),
               child: Column(

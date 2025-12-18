@@ -23,7 +23,8 @@ import '../pages/monitoring/add_land_screen.dart';
 import '../pages/news/news_article_detail_page.dart';
 import '../pages/news/comments_page.dart';
 import '../models/comment_model.dart';
-import '../pages/news/article_list_screen.dart'; // IMPORT NEW SCREEN
+import '../pages/news/article_list_screen.dart';
+import '../pages/profile/customer_service_screen.dart';
 
 class AppRoutes {
   static const splash = '/splash';
@@ -44,9 +45,10 @@ class AppRoutes {
   static const changePassword = '/change-password';
   static const notifications = '/notifications';
   static const terms = '/terms';
+  static const customerService = '/customer-service';
   
   static const newsArticle = '/news-article';
-  static const articleList = '/article-list'; // NEW ROUTE
+  static const articleList = '/article-list';
   static const comments = '/comments';
   
   static const monitoring = '/monitoring';
@@ -85,6 +87,7 @@ class AppRoutes {
         changePassword: (_) => const ChangePasswordScreen(),
         notifications: (_) => const NotificationScreen(),
         terms: (_) => const TermsScreen(),
+        customerService: (_) => const CustomerServiceScreen(),
         
         // Updated News Article Route to accept ID
         newsArticle: (context) {

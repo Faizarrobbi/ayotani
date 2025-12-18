@@ -35,7 +35,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
       if (mounted) {
         Navigator.pop(context);
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Password berhasil diganti! Gunakan password baru saat login nanti.')),
+          const SnackBar(content: Text('Password berhasil diganti! Gunakan password baru saat login nanti')),
         );
       }
     } catch (e) {
