@@ -48,7 +48,15 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
             elevation: 0,
             leading: IconButton(
               icon: const Icon(Icons.arrow_back_ios_new, size: 20, color: Colors.black),
-              onPressed: () => Navigator.pop(context),
+              // FIX: Handle navigation safely
+              onPressed: () {
+                if (Navigator.canPop(context)) {
+                  Navigator.pop(context);
+                } else {
+                  // If no history (e.g. after purchase), go to Marketplace
+                  Navigator.pushReplacementNamed(context, AppRoutes.marketplace);
+                }
+              },
             ),
             title: const Text(
               'Keranjang',
@@ -66,8 +74,6 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
                         child: Column(
                           children: [
                             // Wrap items in a white container to mimic the "Shop Group" card
-                            // Since we don't have shop data, we wrap everything in one "Eka farm shop" block
-                            // to match the design requested.
                             Container(
                               decoration: BoxDecoration(
                                 color: Colors.white,

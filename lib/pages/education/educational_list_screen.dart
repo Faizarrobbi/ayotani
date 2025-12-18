@@ -25,9 +25,10 @@ class _EducationalListScreenState extends State<EducationalListScreen> {
 
   void _reload() {
     setState(() {
+      // FIX: Use specific video methods instead of generic ones
       _future = _selected == 'All'
-          ? _service.getAllContent()
-          : _service.getContentByDifficulty(_selected);
+          ? _service.getVideos() 
+          : _service.getVideosByDifficulty(_selected); 
     });
   }
 
@@ -148,7 +149,8 @@ class _VideoCard extends StatelessWidget {
           color: Colors.white,
           borderRadius: BorderRadius.circular(14),
           border: Border.all(color: Colors.grey[200]!),
-          boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 6, offset: const Offset(0, 3))],
+          // FIX: Replaced withOpacity with withValues for Flutter 3.27+
+          boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.04), blurRadius: 6, offset: const Offset(0, 3))],
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -180,7 +182,8 @@ class _VideoCard extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                     decoration: BoxDecoration(
-                      color: AppColors.green.withOpacity(0.10),
+                      // FIX: Replaced withOpacity with withValues
+                      color: AppColors.green.withValues(alpha: 0.10),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Text(

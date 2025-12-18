@@ -17,6 +17,13 @@ import '../pages/profile/edit_profile_screen.dart';
 import '../pages/profile/change_password_screen.dart';
 import '../pages/profile/notification_screen.dart';
 import '../pages/profile/terms_screen.dart';
+import '../pages/monitoring/monitoring_screen.dart';
+import '../pages/monitoring/land_list_screen.dart';
+import '../pages/monitoring/add_land_screen.dart';
+import '../pages/news/news_article_detail_page.dart';
+import '../pages/news/comments_page.dart';
+import '../models/comment_model.dart';
+import '../pages/news/article_list_screen.dart'; // IMPORT NEW SCREEN
 
 class AppRoutes {
   static const splash = '/splash';
@@ -37,6 +44,14 @@ class AppRoutes {
   static const changePassword = '/change-password';
   static const notifications = '/notifications';
   static const terms = '/terms';
+  
+  static const newsArticle = '/news-article';
+  static const articleList = '/article-list'; // NEW ROUTE
+  static const comments = '/comments';
+  
+  static const monitoring = '/monitoring';
+  static const landList = '/land-list';
+  static const addLand = '/add-land';
 
   static Map<String, WidgetBuilder> get routes => {
         splash: (_) => const SplashScreen(),
@@ -53,8 +68,7 @@ class AppRoutes {
         checkout: (_) => const CheckoutScreen(),
         paymentMethod: (_) => const PaymentMethodScreen(),
         payment: (context) {
-          final args = ModalRoute.of(context)?.settings.arguments
-              as Map<String, dynamic>?;
+          final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
           return PaymentScreen(
             totalAmount: args?['totalAmount'] as double? ?? 0.0,
             paymentMethod: args?['paymentMethod'] as String? ?? 'Unknown',
@@ -63,8 +77,7 @@ class AppRoutes {
         paymentDone: (_) => const PaymentDoneScreen(),
         educational: (_) => const EducationalListScreen(),
         educationalDetail: (context) {
-          final args = ModalRoute.of(context)?.settings.arguments
-              as Map<String, dynamic>?;
+          final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
           final id = args?['id'] as int? ?? 0;
           return EducationalDetailScreen(contentId: id);
         },
@@ -72,5 +85,31 @@ class AppRoutes {
         changePassword: (_) => const ChangePasswordScreen(),
         notifications: (_) => const NotificationScreen(),
         terms: (_) => const TermsScreen(),
+        
+        // Updated News Article Route to accept ID
+        newsArticle: (context) {
+          final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+          final articleId = args?['articleId'] as int?;
+          return NewsArticleDetailPage(articleId: articleId);
+        },
+        
+        // NEW Article List Route
+        articleList: (_) => const ArticleListScreen(),
+
+        comments: (context) {
+          final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+          return CommentsPage(
+            comments: args?['comments'] as List<Comment>? ?? [],
+            commentCount: args?['commentCount'] as int? ?? 0,
+          );
+        },
+        
+        landList: (_) => const LandListScreen(),
+        addLand: (_) => const AddLandScreen(),
+        monitoring: (context) {
+          final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+          final initialLandId = args?['landId'] as int?;
+          return MonitoringScreen(initialLandId: initialLandId);
+        },
       };
 }

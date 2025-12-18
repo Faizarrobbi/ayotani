@@ -19,11 +19,13 @@ class _EducationalPlayerScreenState extends State<EducationalPlayerScreen> {
   void initState() {
     super.initState();
 
-    final videoId =
-        YoutubePlayer.convertUrlToId(widget.content.videoUrl);
+    // FIX: Handle null videoUrl safely
+    final videoId = YoutubePlayer.convertUrlToId(widget.content.videoUrl ?? '');
 
+    // Note: If videoId is null, we can't play anything. 
+    // We initialize with a safe default or handle it in UI.
     _controller = YoutubePlayerController(
-      initialVideoId: videoId!,
+      initialVideoId: videoId ?? '',
       flags: const YoutubePlayerFlags(
         autoPlay: true,
         mute: false,
@@ -39,6 +41,14 @@ class _EducationalPlayerScreenState extends State<EducationalPlayerScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // If invalid video ID, show message
+    if (_controller.initialVideoId.isEmpty) {
+      return Scaffold(
+        appBar: AppBar(title: Text(widget.content.title)),
+        body: const Center(child: Text("Video tidak tersedia atau URL rusak")),
+      );
+    }
+
     return Scaffold(
       appBar: AppBar(title: Text(widget.content.title)),
       body: Column(
