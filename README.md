@@ -113,22 +113,19 @@ Ikuti langkah ini untuk menjalankan proyek di lokal komputer Anda:
 
 Proyek ini dikembangkan oleh **Kelompok 09 - Kelas B** Departemen Sistem Informasi ITS sebagai Laporan Proyek Akhir.
 
-| Nama | NRP | Peran |
-| :--- | :--- | :--- |
-| **Muhammad Fiqih Soetam Putra** | 5026231096 | Lead Backend Engineer |
-| **Akhtar Zia Faizarrobbi** | 5026231095 | Project Manager & DevOps |
-| **Felix Prajna Santoso** | 5026231027 | System Analyst & Technical Writer |
-| **Harbima Razan Adhitya** | 5026231225 | Frontend Developer (Transaction) |
-| **Lita Sari Banjanahor** | 5026231029 | Frontend Developer (Core Features) |
-| **Michelle Lea Amanda** | 5026231214 | UI/UX Researcher & QA |
+| Nama | NRP |
+| :--- | :--- |
+| **Muhammad Fiqih Soetam Putra** | 5026231096 |
+| **Akhtar Zia Faizarrobbi** | 5026231095 |
+| **Felix Prajna Santoso** | 5026231027 |
+| **Harbima Razan Adhitya** | 5026231225 |
+| **Lita Sari Banjanahor** | 5026231029 |
+| **Michelle Lea Amanda** | 5026231214 |
 
 ---
-
 <div align="center">
   <small>Dikembangkan dengan ❤️ untuk Pertanian Indonesia</small>
 </div>
-
-```
 
 ### Tips Tambahan untuk Tampilan Github:
 
