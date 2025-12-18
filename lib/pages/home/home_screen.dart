@@ -163,110 +163,120 @@ class _HomeContentState extends State<_HomeContent> {
   @override
   Widget build(BuildContext context) {
     final name = widget.userProfile?.username ?? 'Petani';
-    // Removed gems and level variables
 
     return SingleChildScrollView(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: Stack(
         children: [
-          _buildCustomHeader(name), // Removed level/gems arguments
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: _buildWeatherCard(),
+          // 1. Background Layer (Green Header)
+          // Moves independently behind the content to create the overlap effect
+          Container(
+            height: 280, 
+            decoration: const BoxDecoration(
+              color: Color(0xFF0A3D2F),
+              borderRadius: BorderRadius.vertical(bottom: Radius.circular(32)),
+            ),
           ),
-          const SizedBox(height: 24),
 
-          _buildSectionHeader('Lahan Pertanian', () {
-             Navigator.pushNamed(context, AppRoutes.landList);
-          }),
-          const SizedBox(height: 12),
-          _buildLandList(),
+          // 2. Foreground Content Layer
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildHeaderContent(name),
+              
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: _buildWeatherCard(),
+              ),
+              
+              const SizedBox(height: 32), // Consistent spacing after floating card
 
-          const SizedBox(height: 24),
+              _buildSectionHeader('Lahan Pertanian', () {
+                 Navigator.pushNamed(context, AppRoutes.landList);
+              }),
+              const SizedBox(height: 16),
+              _buildLandList(),
 
-          _buildSectionHeader('Video Belajar', () {
-            Navigator.pushNamed(context, AppRoutes.educational);
-          }),
-          const SizedBox(height: 12),
-          _buildFilterChips(),
-          const SizedBox(height: 16),
-          _buildVideoList(),
+              const SizedBox(height: 32),
 
-          const SizedBox(height: 24),
+              _buildSectionHeader('Video Belajar', () {
+                Navigator.pushNamed(context, AppRoutes.educational);
+              }),
+              const SizedBox(height: 16),
+              _buildFilterChips(),
+              const SizedBox(height: 16),
+              _buildVideoList(),
 
-          _buildSectionHeader('Artikel Terbaru', () {
-             Navigator.pushNamed(context, AppRoutes.articleList);
-          }),
-          const SizedBox(height: 12),
-          _buildArticleList(),
+              const SizedBox(height: 32),
 
-          const SizedBox(height: 30),
+              _buildSectionHeader('Artikel Terbaru', () {
+                 Navigator.pushNamed(context, AppRoutes.articleList);
+              }),
+              const SizedBox(height: 16),
+              _buildArticleList(),
+
+              const SizedBox(height: 100), // Bottom padding for navigation bar
+            ],
+          ),
         ],
       ),
     );
   }
 
-  Widget _buildCustomHeader(String name) {
-    return Stack(
-      children: [
-        Container(
-          width: double.infinity,
-          height: 200, // Slightly reduced height since we removed the gems row
-          decoration: const BoxDecoration(
-            color: Color(0xFF0A3D2F),
-            borderRadius: BorderRadius.vertical(bottom: Radius.circular(32)),
-          ),
-        ),
-        SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+  Widget _buildHeaderContent(String name) {
+    return SafeArea(
+      bottom: false,
+      child: Padding(
+        padding: const EdgeInsets.all(20.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const SizedBox(height: 8),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Row(
+                    CircleAvatar(
+                      radius: 24,
+                      backgroundColor: Colors.white,
+                      backgroundImage: widget.userProfile?.avatarUrl != null ? NetworkImage(widget.userProfile.avatarUrl!) : null,
+                      child: widget.userProfile?.avatarUrl == null ? const Icon(Icons.person, size: 28, color: Colors.grey) : null,
+                    ),
+                    const SizedBox(width: 12),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        CircleAvatar(
-                          radius: 24,
-                          backgroundColor: Colors.white,
-                          backgroundImage: widget.userProfile?.avatarUrl != null ? NetworkImage(widget.userProfile.avatarUrl!) : null,
-                          child: widget.userProfile?.avatarUrl == null ? const Icon(Icons.person, size: 28, color: Colors.grey) : null,
-                        ),
-                        const SizedBox(width: 12),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text('Halo, $name', style: GoogleFonts.inter(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
-                            Text('Mau belajar apa hari ini?', style: GoogleFonts.inter(color: Colors.white70, fontSize: 12)),
-                          ],
-                        ),
+                        Text('Halo, $name', style: GoogleFonts.inter(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+                        Text('Mau belajar apa hari ini?', style: GoogleFonts.inter(color: Colors.white70, fontSize: 12)),
                       ],
                     ),
-                    const Icon(Icons.notifications_outlined, color: Colors.white, size: 28),
                   ],
                 ),
-                // Removed the Gems/Level Container here
-                const SizedBox(height: 24),
                 Container(
-                  height: 48,
-                  decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12), boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, 4))]),
-                  child: TextField(
-                    decoration: InputDecoration(
-                      prefixIcon: const Icon(Icons.search, color: Colors.grey),
-                      hintText: 'Cari sesuatu...',
-                      hintStyle: GoogleFonts.inter(color: Colors.grey[400]),
-                      border: InputBorder.none,
-                      contentPadding: const EdgeInsets.symmetric(vertical: 14),
-                    ),
-                  ),
-                ),
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(color: Colors.white.withOpacity(0.1), shape: BoxShape.circle),
+                  child: const Icon(Icons.notifications_outlined, color: Colors.white, size: 24),
+                )
               ],
             ),
-          ),
+            const SizedBox(height: 24),
+            Container(
+              height: 48,
+              decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12), boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, 4))]),
+              child: TextField(
+                decoration: InputDecoration(
+                  prefixIcon: const Icon(Icons.search, color: Colors.grey),
+                  hintText: 'Cari sesuatu...',
+                  hintStyle: GoogleFonts.inter(color: Colors.grey[400]),
+                  border: InputBorder.none,
+                  contentPadding: const EdgeInsets.symmetric(vertical: 14),
+                ),
+              ),
+            ),
+            const SizedBox(height: 16), // Space before Weather Card starts
+          ],
         ),
-      ],
+      ),
     );
   }
 
@@ -276,7 +286,15 @@ class _HomeContentState extends State<_HomeContent> {
       width: double.infinity,
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
+        color: Colors.white, // Ensure card has background since it overlaps
         borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 15,
+            offset: const Offset(0, 8),
+          ),
+        ],
         image: const DecorationImage(
           image: NetworkImage('https://images.unsplash.com/photo-1534088568595-a066f410bcda?auto=format&fit=crop&w=800&q=80'),
           fit: BoxFit.cover,
@@ -342,6 +360,7 @@ class _HomeContentState extends State<_HomeContent> {
                 borderRadius: BorderRadius.circular(16),
                 color: Colors.grey[200],
                 image: DecorationImage(image: NetworkImage(imageUrl), fit: BoxFit.cover),
+                boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 8, offset: const Offset(0, 4))],
               ),
               child: Stack(
                 children: [
