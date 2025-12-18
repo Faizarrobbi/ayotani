@@ -101,7 +101,7 @@ class _HomeContentState extends State<_HomeContent> {
   Map<String, dynamic>? _weatherData;
   List<Land> _lands = [];
   List<EducationalContent> _videos = [];
-  List<EducationalContent> _articles = []; // Separate list for articles
+  List<EducationalContent> _articles = [];
   String _selectedDifficulty = 'All';
   bool _isLoading = true;
 
@@ -124,7 +124,6 @@ class _HomeContentState extends State<_HomeContent> {
 
     _fetchWeather(-7.2575, 112.7521);
 
-    // Fetch Videos and Articles separately
     final videos = await _educationalService.getVideos();
     final articles = await _educationalService.getArticles();
 
@@ -164,14 +163,13 @@ class _HomeContentState extends State<_HomeContent> {
   @override
   Widget build(BuildContext context) {
     final name = widget.userProfile?.username ?? 'Petani';
-    final gems = (widget.userProfile?.gems ?? 0).toString();
-    final level = (widget.userProfile?.level ?? 1).toString();
+    // Removed gems and level variables
 
     return SingleChildScrollView(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildCustomHeader(name, level, gems),
+          _buildCustomHeader(name), // Removed level/gems arguments
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: _buildWeatherCard(),
@@ -196,7 +194,6 @@ class _HomeContentState extends State<_HomeContent> {
 
           const SizedBox(height: 24),
 
-          // Updated Section Header to route to Article List
           _buildSectionHeader('Artikel Terbaru', () {
              Navigator.pushNamed(context, AppRoutes.articleList);
           }),
@@ -209,15 +206,12 @@ class _HomeContentState extends State<_HomeContent> {
     );
   }
 
-  // ... (Header, WeatherCard, LandList, FilterChips - Same as before)
-  // Re-pasting for completeness if needed, but omitted here to focus on logic changes
-  
-  Widget _buildCustomHeader(String name, String level, String gems) {
+  Widget _buildCustomHeader(String name) {
     return Stack(
       children: [
         Container(
           width: double.infinity,
-          height: 220,
+          height: 200, // Slightly reduced height since we removed the gems row
           decoration: const BoxDecoration(
             color: Color(0xFF0A3D2F),
             borderRadius: BorderRadius.vertical(bottom: Radius.circular(32)),
@@ -253,12 +247,7 @@ class _HomeContentState extends State<_HomeContent> {
                     const Icon(Icons.notifications_outlined, color: Colors.white, size: 28),
                   ],
                 ),
-                const SizedBox(height: 12),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                  decoration: BoxDecoration(color: Colors.white.withOpacity(0.1), borderRadius: BorderRadius.circular(20)),
-                  child: Text('Level $level | $gems Gems', style: GoogleFonts.inter(color: const Color(0xFFFFD700), fontSize: 12, fontWeight: FontWeight.w600)),
-                ),
+                // Removed the Gems/Level Container here
                 const SizedBox(height: 24),
                 Container(
                   height: 48,
@@ -367,7 +356,7 @@ class _HomeContentState extends State<_HomeContent> {
     );
   }
 
-  Widget _buildFilterChips() { return const SizedBox(); } // Simplified for brevity
+  Widget _buildFilterChips() { return const SizedBox(); } 
 
   Widget _buildVideoList() {
     if (_videos.isEmpty) return const Center(child: Text("No videos"));
@@ -402,7 +391,6 @@ class _HomeContentState extends State<_HomeContent> {
     );
   }
 
-  // UPDATED: Use _articles list and navigate to Article Detail
   Widget _buildArticleList() {
     if (_articles.isEmpty) return const SizedBox();
 
@@ -419,8 +407,8 @@ class _HomeContentState extends State<_HomeContent> {
             onTap: () {
               Navigator.pushNamed(
                 context,
-                AppRoutes.newsArticle, // Route to the NEW dynamic article page
-                arguments: {'articleId': article.id}, // Pass ID
+                AppRoutes.newsArticle,
+                arguments: {'articleId': article.id},
               );
             },
             child: Container(
